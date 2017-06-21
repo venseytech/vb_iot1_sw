@@ -1,0 +1,6 @@
+config BR2_PACKAGE_VENSEY_TEST_JDK
+	bool "vensey_test_jdk"
+	help
+		Example application provided for Java applications
+	 	http://www.vensey.de
+

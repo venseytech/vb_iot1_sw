@@ -1,0 +1,4 @@
+config BR2_PACKAGE_ORACLE_JDK
+	bool "oraclejdk"
+	help
+		http://www.oracle.com/technetwork/java/embedded/embedded-se/downloads/index.html

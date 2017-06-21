@@ -1,0 +1,8 @@
+config BR2_PACKAGE_RXTX
+	bool "rxtx"
+	depends on BR2_PACKAGE_ORACLE_JDK
+	help
+	  rxtx is the java libraries for serial communication over RS232
+
+	  http://rxtx.qbang.org/pub/rxtx
+

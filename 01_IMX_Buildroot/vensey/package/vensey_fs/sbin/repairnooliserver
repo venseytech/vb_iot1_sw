@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Repair script for the nooli server
+
+test_program_nooli=`ps | grep java | grep -v $0 | grep -v grep | awk '{print $3}' `;
+
+if [ -z "$test_program_nooli" ]; then
+        /etc/init.d/S40nooli start ;
+fi
+

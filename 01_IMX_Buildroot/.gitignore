@@ -1,0 +1,9 @@
+output/*
+output/
+dl/
+..config.tmp
+.config.old
+.config
+vensey/package/vensey_urt_srv/bin
+vensey/package/vensey_urt_srv/binary
+vensey/images/rasp-qt-partitioned.img

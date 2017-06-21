@@ -1,0 +1,18 @@
+menuconfig BR2_PACKAGE_V_PLATFORM
+	bool "VeNSeY Platform Software"
+	help
+	  VeNSeY Applications are divided into two groups, namely, the platform & application
+	  http://www.vensey.de
+	
+	if BR2_PACKAGE_V_PLATFORM
+		menu "VeNSeY Platfrom Software"
+			source package/v_platform/vensey_fs/Config.in
+			source package/v_platform/vensey_pm/Config.in
+			source package/v_platform/internal_temperature/Config.in
+		endmenu
+	endif
+
+
+comment "Notes for the Liscencing..."
+
+

@@ -1,0 +1,1 @@
+java -jar /usr/bin/nooli_server_jdk.jar -sd /dev/ttyAPP0 -i2c /dev/i2c-0 -ps 1506 -pi 1507 -v 

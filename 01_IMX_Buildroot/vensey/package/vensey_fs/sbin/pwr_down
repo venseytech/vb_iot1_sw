@@ -1,0 +1,4 @@
+modprobe vensey_pm 
+echo clr_autostrt > /proc/pm_experimental 
+echo s_down_f > /proc/pm_experimental 
+

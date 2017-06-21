@@ -1,0 +1,16 @@
+menuconfig BR2_PACKAGE_V_OPENSOURCE
+	bool "Open Source Software"
+	help
+	  VeNSeY software to be released or the open source utilities 
+	  used different than the buildroot environment are stored here.  
+
+	  http://www.vensey.de
+
+	
+	if BR2_PACKAGE_V_OPENSOURCE
+		menu "Required Open Source Packages"
+			source package/v_opensource/rxtx/Config.in
+			source package/v_opensource/oracle_jdk/Config.in 
+		endmenu
+	endif
+

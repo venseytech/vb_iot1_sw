@@ -1,0 +1,183 @@
+diff -Nur uboot-2016.11-rc3.orig/arch/arm/cpu/arm926ejs/mxs/spl_power_init.c uboot-2016.11-rc3/arch/arm/cpu/arm926ejs/mxs/spl_power_init.c
+--- uboot-2016.11-rc3.orig/arch/arm/cpu/arm926ejs/mxs/spl_power_init.c	2016-10-31 21:36:10.000000000 +0100
++++ uboot-2016.11-rc3/arch/arm/cpu/arm926ejs/mxs/spl_power_init.c	2017-02-22 16:41:48.862686424 +0100
+@@ -310,9 +310,17 @@
+ 			POWER_LOOPCTRL_RCSCALE_THRESH |
+ 			POWER_LOOPCTRL_EN_RCSCALE_8X);
+ 
+-	clrsetbits_le32(&power_regs->hw_power_minpwr,
+-			POWER_MINPWR_HALFFETS, POWER_MINPWR_DOUBLE_FETS);
++	/*
++	 * change starting for the battery boot up for the following 2 lines
++	 */ 
++
++	//clrsetbits_le32(&power_regs->hw_power_minpwr,
++	//		POWER_MINPWR_HALFFETS, POWER_MINPWR_DOUBLE_FETS);
+ 
++	/*
++       * change finished
++       */
++   
+ 	/* 5V to battery handoff ... FIXME */
+ 	setbits_le32(&power_regs->hw_power_5vctrl, POWER_5VCTRL_DCDC_XFER);
+ 	early_delay(30);
+@@ -550,6 +558,39 @@
+ 	writel(POWER_CTRL_DCDC4P2_BO_IRQ, &power_regs->hw_power_ctrl_clr);
+ }
+ 
++
++
++/**
++ * mxs_power_init_clear_4p2_brownouts() - Clear 4p2 brownouts for boot up
++ * The following function is a dirty trick, this is to be FIXED.
++ */
++static void mxs_power_init_clear_4p2_brownouts(void)
++{
++    struct mxs_power_regs *power_regs =
++    (struct mxs_power_regs *)MXS_POWER_BASE;
++    uint32_t tmp, tmp2;
++    
++    debug("SPL: Clearing 4p2 brownouts \n");
++    
++    /*
++     * Here we set the 4p2 brownout level to something very close to 4.2V.
++     * We then check the brownout status. If the brownout status is false,
++     * the voltage is already close to the target voltage of 4.2V so we
++     * can go ahead and set the 4P2 current limit to our max target limit.
++     * If the brownout status is true, we need to ramp us the current limit
++     * so that we don't cause large inrush current issues. We step up the
++     * current limit until the brownout status is false or until we've
++     * reached our maximum defined 4p2 current limit.
++     */
++    debug("SPL: Setting 4P2 brownout level\n");
++    clrsetbits_le32(&power_regs->hw_power_dcdc4p2,
++                    POWER_DCDC4P2_BO_MASK,
++                    0 << POWER_DCDC4P2_BO_OFFSET);	/* 3.6V */
++
++    setbits_le32(&power_regs->hw_power_dcdc4p2, POWER_DCDC4P2_BO_MASK);
++    writel(POWER_CTRL_DCDC4P2_BO_IRQ, &power_regs->hw_power_ctrl_clr);
++}
++
+ /**
+  * mxs_power_init_dcdc_4p2_source() - Switch DC-DC converter to 4P2 source
+  *
+@@ -726,10 +767,14 @@
+ 	clrbits_le32(&power_regs->hw_power_5vctrl, POWER_5VCTRL_DCDC_XFER);
+ 
+ 	writel(POWER_CTRL_ENIRQ_DCDC4P2_BO, &power_regs->hw_power_ctrl_clr);
+-
+-	clrsetbits_le32(&power_regs->hw_power_minpwr,
+-			POWER_MINPWR_HALFFETS, POWER_MINPWR_DOUBLE_FETS);
+-
++	/*
++	 *  change starting for the battery boot up 
++	 */
++	//clrsetbits_le32(&power_regs->hw_power_minpwr,
++	//		POWER_MINPWR_HALFFETS, POWER_MINPWR_DOUBLE_FETS);
++	/*
++	 * change finished 
++	 */  
+ 	mxs_power_set_linreg();
+ 
+ 	clrbits_le32(&power_regs->hw_power_vdddctrl,
+@@ -751,7 +796,86 @@
+ 		POWER_5VCTRL_CHARGE_4P2_ILIMIT_MASK,
+ 		0x8 << POWER_5VCTRL_CHARGE_4P2_ILIMIT_OFFSET);
+ 
+-	mxs_power_enable_4p2();
++	/*
++	 * change 
++	 */ 
++
++       //mxs_power_enable_4p2();
++	
++	/*
++       * change finished
++       */   
++}
++
++
++/**
++ * print_mxs_power_reg_content() - Content of the power registers are printed
++ *
++ */
++static void print_mxs_power_reg_content(void)
++{
++    struct mxs_power_regs *power_regs =
++    (struct mxs_power_regs *)MXS_POWER_BASE;
++    
++    /*
++     * clearing the battery EN_BATADJ and PWDN_BATTBRNOUT
++     * additionally set the POWER_BATTMONITOR_BRWNOUT_PWD 
++     * finally, just to make sure that the brownout level is set to 2.44V
++     */
++    clrbits_le32(&power_regs->hw_power_battmonitor,
++                 POWER_BATTMONITOR_EN_BATADJ);
++    clrbits_le32(&power_regs->hw_power_battmonitor,
++                 POWER_BATTMONITOR_PWDN_BATTBRNOUT);
++    setbits_le32(&power_regs->hw_power_battmonitor,
++                 POWER_BATTMONITOR_BRWNOUT_PWD);
++    clrsetbits_le32(&power_regs->hw_power_battmonitor,
++                    POWER_BATTMONITOR_BRWNOUT_LVL_MASK,
++                    1 << POWER_BATTMONITOR_BRWNOUT_LVL_OFFSET);
++    
++    /*
++     * clearing PWDN_5VBRNOUT
++     */
++    clrbits_le32(&power_regs->hw_power_5vctrl,
++                 POWER_5VCTRL_PWDN_5VBRNOUT);
++    
++    /*
++     * clearing the hw_power_vddioctrl related brownouts
++     */
++    clrbits_le32(&power_regs->hw_power_vddioctrl,
++                 POWER_VDDIOCTRL_PWDN_BRNOUT);
++    clrbits_le32(&power_regs->hw_power_vdddctrl,
++                 POWER_VDDDCTRL_PWDN_BRNOUT);
++    clrbits_le32(&power_regs->hw_power_vddactrl,
++                 POWER_VDDACTRL_PWDN_BRNOUT);
++    /*
++    clrsetbits_le32(&power_regs->hw_power_vddioctrl,
++                    POWER_VDDIOCTRL_BO_OFFSET_MASK,
++                    7 << POWER_VDDIOCTRL_BO_OFFSET_OFFSET);
++    
++    clrsetbits_le32(&power_regs->hw_power_vddioctrl,
++                    POWER_VDDIOCTRL_TRG_MASK,
++                    0 << POWER_VDDIOCTRL_TRG_OFFSET);
++     */ 
++    
++    printf("\n");
++    printf("hw_power_ctrl: 0x%08x \n", power_regs->hw_power_ctrl);
++    printf("hw_power_5vctrl: 0x%08x \n", power_regs->hw_power_5vctrl);
++    printf("hw_power_minpwr: 0x%08x \n", power_regs->hw_power_minpwr);
++    printf("hw_power_charge: 0x%08x \n", power_regs->hw_power_charge);
++    printf("hw_power_vdddctrl: 0x%08x \n", power_regs->hw_power_vdddctrl);
++    printf("hw_power_vddactrl: 0x%08x \n", power_regs->hw_power_vddactrl);
++    printf("hw_power_vddioctrl: 0x%08x \n", power_regs->hw_power_vddioctrl);
++    printf("hw_power_vddmemctrl: 0x%08x \n", power_regs->hw_power_vddmemctrl);
++    printf("hw_power_dcdc4p2: 0x%08x \n", power_regs->hw_power_dcdc4p2);
++    printf("hw_power_misc: 0x%08x \n", power_regs->hw_power_misc);
++    printf("hw_power_dclimits: 0x%08x \n", power_regs->hw_power_dclimits);
++    printf("hw_power_loopctrl: 0x%08x \n", power_regs->hw_power_loopctrl);
++    printf("hw_power_sts: 0x%08x \n", power_regs->hw_power_sts);
++    printf("hw_power_speed: 0x%08x \n", power_regs->hw_power_speed);
++    printf("hw_power_battmonitor: 0x%08x \n", power_regs->hw_power_battmonitor);
++    printf("hw_power_special: 0x%08x \n", power_regs->hw_power_special);
++    
++    
+ }
+ 
+ /**
+@@ -1268,6 +1392,12 @@
+ 
+ 	writel(POWER_5VCTRL_PWDN_5VBRNOUT, &power_regs->hw_power_5vctrl_set);
+ 
++    /*
++     *  TODO: Fix the following call
++     */
++     //mxs_power_init_clear_4p2_brownouts();
++     print_mxs_power_reg_content();
++    
+ 	early_delay(1000);
+ }
+ 

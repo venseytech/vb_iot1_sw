@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Starts nooli services
+#
+# Allow a few customizations from a config file
+
+start() {
+	export PATH=$PATH:/opt/local/ejdk1.8.0_111/bin                        
+        echo $PATH
+	echo -n "Logging with tail..." 
+	tail -f /var/log/messages & 
+	echo -n "Starting nooli service... "
+	start-stop-daemon -S -q -p /var/run/nooli.pid \
+		--exec /sbin/start_nooli_server &
+	[ $? == 0 ] && echo "OK" || echo "FAIL"
+}
+stop() {
+	echo -n "Stopping nooli service "
+	start-stop-daemon -K -q -p /var/run/nooli.pid
+	[ $? == 0 ] && echo "OK" || echo "FAIL"
+}
+restart() {
+	stop
+	start
+}
+
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart|reload)
+  	restart
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+

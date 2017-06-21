@@ -1,0 +1,67 @@
+#!/bin/sh
+#########################################################
+#######    VeNSeY Technology			#########
+#######    - Simple modem start script. 	#########
+#########################################################
+
+# CONSTANTS
+WAIT_FOR_MODEM_REGISTRATION=5 
+WAIT_FOR_STABLE_PPPD_PID=1
+GET_MODEM_POWER_STATE=0x17
+ATM_ADDRESS=0x05
+BUS_ADDRESS=0
+START_MODEM_COMMAND=0x04
+
+function set_arguments_if_provided
+{
+	if [ $# -gt 1 ]; then
+		echo "$# arguments provided" 
+		WAIT_FOR_MODEM_REGISTRATION=$1
+		WAIT_FOR_STABLE_PPPD_PID=$2
+	else 
+		echo "$# arguments! Using default values" 
+	fi 
+}
+
+function check_modem_state_and_start_if_necessary
+{
+	#set the register value to modem_state 
+	i2cset -y $BUS_ADDRESS $ATM_ADDRESS $GET_MODEM_POWER_STATE
+	return_val=$(i2cget -y $BUS_ADDRESS $ATM_ADDRESS)
+	echo "modem_state is $return_val"  
+	
+	if [ $return_val = "0x01" ]; then 
+		echo "Modem is powered on" 
+	else 
+		echo "Powering modem" 
+		i2cset -y $BUS_ADDRESS $ATM_ADDRESS $START_MODEM_COMMAND
+	fi 
+}
+#### Main Programm ### 
+
+# get script parameters if provided... 
+set_arguments_if_provided
+
+# Send the power manager the command for toggling modem on 
+#i2cset -y 0 0x05 0x04 
+check_modem_state_and_start_if_necessary
+
+# kill any existing tail event 
+# TODO: this is not a clean call, tobe corrected 
+killall tail 
+
+# tail the log messages just for debug purposes 
+tail -f /var/log/messages &
+
+# sleep for a while so that the modem is registered
+sleep $WAIT_FOR_MODEM_REGISTRATION 
+
+# start the pppd and expect the internet connection 
+pon sim900 
+
+# sleep for a short while for the pppd to be started by the OS
+sleep $WAIT_FOR_STABLE_PPPD_PID 
+
+# get the pid of the pppd, which is to be tracked by other services
+ps axf | grep pppd | grep -v grep | awk '{print "" $1 }' > /root/modem_on.pid
+

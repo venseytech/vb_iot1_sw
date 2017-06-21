@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# Test script for the nooli server 
+
+test_program_nooli=`ps | grep java | grep -v $0 | grep -v grep | awk '{print $3}' `;
+
+if [ -z "$test_program_csd" ]; then
+	echo "nooli test failed"; 
+	exit -1; 
+fi
+
+exit 0;

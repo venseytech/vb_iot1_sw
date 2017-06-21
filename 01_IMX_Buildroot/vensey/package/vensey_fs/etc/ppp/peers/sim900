@@ -1,0 +1,11 @@
+connect "/usr/sbin/chat -v -f /etc/chatscripts/sim900 -T web.vodafone.de"
+/dev/ttyAPP0
+115200
+noipdefault
+usepeerdns
+defaultroute
+persist
+noauth
+nocrtscts
+local
+

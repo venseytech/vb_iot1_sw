@@ -1,0 +1,36 @@
+#! /bin/sh
+# 
+# watchdog timer for the nooli server application 
+
+test -x /sbin/watchdog || exit 0 
+
+start() {
+        echo "Starting watchdog timer for nooli server..."
+        start-stop-daemon -q -S -b -x /sbin/watchdog -- -c /etc/watchdognooli.conf &
+}
+stop() {
+        echo -n "Stoping watchdog timer for nooli server."
+	start-stop-daemon -q -K -x /sbin/watchdog
+}
+restart() {
+        stop
+        start
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        restart
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?
+

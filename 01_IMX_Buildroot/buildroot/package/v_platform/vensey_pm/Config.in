@@ -1,0 +1,5 @@
+config BR2_PACKAGE_VENSEY_PM
+	bool "vensey_pm"
+	help
+	  vensey_pm is the kernel module for different power management options and related configurations from the user space
+

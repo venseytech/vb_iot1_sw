@@ -1,0 +1,6 @@
+poff sim900 
+sleep 1
+i2cset -y 0 0x05 0x03 
+rm /root/modem_on.pid
+
+

@@ -1,0 +1,15 @@
+menuconfig BR2_PACKAGE_V_APPS
+	bool "VeNSeY Applications Software"
+	help
+		VeNSeY Applications are divided into two groups, namely, the platform & application
+		http://www.vensey.de
+
+	if BR2_PACKAGE_V_APPS
+		menu "VeNSeY Application Software"
+			source package/v_apps/vensey_test_c/Config.in
+			source package/v_apps/vensey_test_jdk/Config.in
+		endmenu
+	endif
+
+comment "@2017 All Rights Reserved to VeNSeY"
+

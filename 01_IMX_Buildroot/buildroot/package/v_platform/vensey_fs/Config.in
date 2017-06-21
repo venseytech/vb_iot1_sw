@@ -1,0 +1,7 @@
+config BR2_PACKAGE_VENSEY_FS
+	bool "vensey_fs"
+	help
+	  vensey_fs is the bunc of files to be copied to the root file system for configuration, etc.
+
+	  http://www.vensey.de
+

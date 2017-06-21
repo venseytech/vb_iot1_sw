@@ -1,0 +1,63 @@
+diff -Nur rxtx-2.2pre2.orig/src/I2CImp.c rxtx-2.2pre2/src/I2CImp.c
+--- rxtx-2.2pre2.orig/src/I2CImp.c	2017-01-03 22:54:08.957278248 +0100
++++ rxtx-2.2pre2/src/I2CImp.c	2017-01-03 22:59:36.261278248 +0100
+@@ -96,6 +96,11 @@
+ #	include <linux/version.h>
+ #endif
+ 
++// Mursel : bug fix due to UTS_RELEASE
++#ifndef UTS_RELEASE
++#define UTS_RELEASE "HBM Simulator" 
++#endif
++
+ extern int errno;
+ #include "I2CImp.h"
+ /* #define DEBUG_TIMEOUT */
+diff -Nur rxtx-2.2pre2.orig/src/RawImp.c rxtx-2.2pre2/src/RawImp.c
+--- rxtx-2.2pre2.orig/src/RawImp.c	2017-01-03 22:54:08.957278248 +0100
++++ rxtx-2.2pre2/src/RawImp.c	2017-01-03 23:00:17.073278248 +0100
+@@ -99,6 +99,13 @@
+ #	include <linux/serial.h>
+ #	include <linux/version.h>
+ #endif
++
++// Mursel : bug fix due to UTS_RELEASE
++#ifndef UTS_RELEASE
++#define UTS_RELEASE "HBM Simulator" 
++#endif
++
++
+ #ifndef __APPLE__  /* dima */
+ #ifndef PPC
+ #include <sys/io.h>
+diff -Nur rxtx-2.2pre2.orig/src/RS485Imp.c rxtx-2.2pre2/src/RS485Imp.c
+--- rxtx-2.2pre2.orig/src/RS485Imp.c	2017-01-03 22:54:08.957278248 +0100
++++ rxtx-2.2pre2/src/RS485Imp.c	2017-01-03 22:59:26.653278248 +0100
+@@ -96,6 +96,11 @@
+ #	include <linux/version.h>
+ #endif
+ 
++// Mursel : bug fix due to UTS_RELEASE
++#ifndef UTS_RELEASE
++#define UTS_RELEASE "HBM Simulator" 
++#endif
++
+ extern int errno;
+ #include "RS485Imp.h"
+ /* #define DEBUG_TIMEOUT */
+diff -Nur rxtx-2.2pre2.orig/src/SerialImp.c rxtx-2.2pre2/src/SerialImp.c
+--- rxtx-2.2pre2.orig/src/SerialImp.c	2017-01-03 22:54:08.957278248 +0100
++++ rxtx-2.2pre2/src/SerialImp.c	2017-01-03 22:58:40.701278248 +0100
+@@ -119,6 +119,12 @@
+ #	include <linux/serial.h>
+ #	include <linux/version.h>
+ #endif /* __linux__ */
++
++// Mursel : bug fix due to UTS_RELEASE
++#ifndef UTS_RELEASE
++#define UTS_RELEASE "HBM Simulator" 
++#endif
++
+ #if defined(__sun__)
+ #	include <sys/filio.h>
+ #	include <sys/mkdev.h>

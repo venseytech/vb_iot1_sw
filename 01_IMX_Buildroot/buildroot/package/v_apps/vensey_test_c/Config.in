@@ -1,0 +1,5 @@
+config BR2_PACKAGE_VENSEY_TEST_C
+	bool "vensey_test_c"
+	help
+		Example hello world application in C
+		http://www.vensey.de

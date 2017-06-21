@@ -1,0 +1,7 @@
+stty -F /dev/ttyAPP0 115200 -echo -echoe -echok 
+echo 60 > /sys/class/gpio/export
+echo out >/sys/class/gpio/gpio60/direction
+#echo 1 > /sys/class/gpio/gpio60/value
+#sleep 3
+modprobe vensey_pm
+lsmod

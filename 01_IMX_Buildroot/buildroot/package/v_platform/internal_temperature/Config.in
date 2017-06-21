@@ -1,0 +1,5 @@
+config BR2_PACKAGE_INTERNAL_TEMPERATURE
+	bool "internal_temperature"
+	help
+	  internal_temperature is an example application for reading CPU internal temperature
+
